@@ -14,7 +14,7 @@ int main() {
 #else
     int hits = 0;
     Lru2qCache<TPage> cache1;
-    hits = cache1.count_hits_2Q();
+    hits = cache1.run();
     std::cout << hits << std::endl;
 #endif
 }
@@ -26,7 +26,7 @@ TEST(count_hits, number) {                                                  \
     int hits, answer;                                                       \
     std::stringstream fTest(fname);                                         \
     Lru2qCache<TPage> cache;                                                       \
-    hits = cache.count_hits_2Q(fTest);                                      \
+    hits = cache.run(fTest);                                      \
                                                                             \
     fTest >> answer;                                                        \
                                                                             \

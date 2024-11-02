@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "containers.hpp"
-#include "LRU.hpp"
+// #include "LRU.hpp"
 
 #define LRU2Q_MIN_CACHE_SIZE 3
 
@@ -42,13 +42,17 @@ struct Q2HashTables {
 template<typename T>
 class Lru2qCache {
 
+private:
+    enum class cacheType {
+        LRU,
+        LRU2Q
+    };
+
 public:
 
-#ifndef TESTING
-    int count_hits_2Q () {
+    int run () {
 
         T page;
-        int hits = 0;
 
         int cacheSize = 0;
         std::cin >> cacheSize;
@@ -57,31 +61,24 @@ public:
         std::cin >> pageCount;
 
         lists.set_lists_size(cacheSize);
-        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) {
+        
+        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) 
+            type = cacheType::LRU2Q;
+        else
+            type = cacheType::LRU;
 
-            for (int i = 0; i < pageCount; i++) {
+        for (int i = 0; i < pageCount; i++) {
 
-                std::cin >> page;
-                lookup_update(page, hits);
-            }
-        }
-
-        else {
-
-            for (int i = 0; i < pageCount; i++) {
-
-                std::cin >> page;
-                lookup_update_LRU(hashTables.mapAm, lists.lstAm, page, hits);
-            }
+            std::cin >> page;
+            lookup_update(page);
         }
 
         return hits;
     }
-#else
-    int count_hits_2Q (std::stringstream &input) {
+
+    int run (std::stringstream &input) {
 
         T page;
-        int hits = 0;
 
         int cacheSize = 0;
         input >> cacheSize;
@@ -90,70 +87,97 @@ public:
         input >> pageCount;
 
         lists.set_lists_size(cacheSize);
-        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) {
 
-            for (int i = 0; i < pageCount; i++) {
+        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) 
+            type = cacheType::LRU2Q;
+        else
+            type = cacheType::LRU;
 
-                input >> page;
-                lookup_update(page, hits);
-            }
-        }
+        for (int i = 0; i < pageCount; i++) {
 
-        else {
-
-            for (int i = 0; i < pageCount; i++) {
-
-                input >> page;
-                lookup_update_LRU(hashTables.mapAm, lists.lstAm, page, hits);
-            }
+            input >> page;
+            lookup_update(page);
         }
 
         return hits;
     }
-#endif
+
 private:
+
+    cacheType type;
     Q2Lists<T> lists = {};
     Q2HashTables<T> hashTables = {}; 
+    int hits = 0;
     
-    void lookup_update(T elem, int &hits) {
+    bool in_map_am (T elem) {
+
         bool isInMapAm = hashTables.mapAm.count(elem) > 0;
-        bool isInMapIn = hashTables.mapIn.count(elem) > 0;
-        bool isInMapOut = hashTables.mapOut.count(elem) > 0;
 
         if (!isInMapAm) { 
-            if (!isInMapIn) {
-                if (!isInMapOut) {
-                    if (lists.lstA1In.listSize == lists.lstA1In.lst.size()) {
-
-                        if (lists.lstA1Out.lst.size() == lists.lstA1Out.listSize) {
-                            delete_from_cache(lists.lstA1Out, hashTables.mapOut);
-                        }
-
-                        add_to_cache(lists.lstA1Out, hashTables.mapOut, lists.lstA1In.lst.back());
-                        delete_from_cache(lists.lstA1In, hashTables.mapIn);
-                    }
-                    add_to_cache(lists.lstA1In, hashTables.mapIn, elem);
-                    return;
-                }
-
-                delete_from_cache(lists.lstA1Out, hashTables.mapOut, elem);
-                if (lists.lstAm.lst.size() == lists.lstAm.listSize) {
-                    delete_from_cache(lists.lstAm, hashTables.mapAm);
-                }
-                
-                add_to_cache(lists.lstAm, hashTables.mapAm, elem);
-                return;
-            }
-
-            hits += 1;
-            delete_from_cache(lists.lstA1In, hashTables.mapIn, elem);
-            add_to_cache(lists.lstA1In, hashTables.mapIn, elem);
-            return;
+            return false;
         }
 
         hits += 1;
         delete_from_cache(lists.lstAm, hashTables.mapAm, elem);
         add_to_cache(lists.lstAm, hashTables.mapAm, elem);
+        return true;
+    }
+
+    bool in_map_in (T elem) {
+
+        bool isInMapIn = hashTables.mapIn.count(elem) > 0;
+
+        if (!isInMapIn) {
+            
+            return false;
+        }
+
+        hits += 1;
+        delete_from_cache(lists.lstA1In, hashTables.mapIn, elem);
+        add_to_cache(lists.lstA1In, hashTables.mapIn, elem);
+        return true;
+    }
+
+    bool in_map_out (T elem) {
+
+        bool isInMapOut = hashTables.mapOut.count(elem) > 0;
+
+        if (!isInMapOut) {
+            
+            return false;
+        }
+
+        delete_from_cache(lists.lstA1Out, hashTables.mapOut, elem);
+        if (lists.lstAm.lst.size() == lists.lstAm.listSize) {
+            delete_from_cache(lists.lstAm, hashTables.mapAm);
+        }
+        
+        add_to_cache(lists.lstAm, hashTables.mapAm, elem);
+        return true;
+            
+    }
+
+    void add_new_page (T elem) {
+
+        if (lists.lstA1In.listSize == lists.lstA1In.lst.size()) {
+
+            if (lists.lstA1Out.lst.size() == lists.lstA1Out.listSize) {
+                delete_from_cache(lists.lstA1Out, hashTables.mapOut);
+            }
+
+            add_to_cache(lists.lstA1Out, hashTables.mapOut, lists.lstA1In.lst.back());
+            delete_from_cache(lists.lstA1In, hashTables.mapIn);
+        }
+        add_to_cache(lists.lstA1In, hashTables.mapIn, elem);
+    }
+
+
+    void lookup_update_2Q(T elem) {
+
+        if (in_map_am(elem)) return;
+        if (in_map_in(elem)) return;
+        if (in_map_out(elem)) return;
+        add_new_page(elem);
     }
 
 
@@ -175,5 +199,39 @@ private:
 
         map.erase(list.lst.back());
         list.lst.pop_back();
+    }
+
+    void lookup_update_LRU (int elem) {
+    
+        auto &map = hashTables.mapAm;
+        auto &lst = lists.lstAm;
+
+        if (map.count(elem) == 0)  {
+            if (lst.lst.size() == lst.listSize) {
+
+                map.erase(lst.lst.back());
+                lst.lst.pop_back();
+            }
+        }
+        else {
+            
+            hits += 1;
+
+            lst.lst.erase(map.find(elem)->second);
+            map.erase(elem);
+        }
+
+        lst.lst.push_front(elem);
+        map.insert({elem, lst.lst.begin()});
+    }
+
+    void lookup_update (T elem) {
+
+        if (type == cacheType::LRU2Q)
+            lookup_update_2Q(elem);
+        else if (type == cacheType::LRU)
+            lookup_update_LRU(elem);
+        else 
+            std::cerr << "unknown cache type" << std::endl;
     }
 };

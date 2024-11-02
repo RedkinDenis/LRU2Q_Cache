@@ -12,7 +12,7 @@ set(INCLUDE_DIR2 ${CMAKE_SOURCE_DIR}/../include)
 find_package(GTest REQUIRED)
 
 SET(SRCS1
-    src/LRU.cpp
+    src/LRU2Q.cpp
 )
 
 add_library(lru2Q STATIC ${SRCS1})
