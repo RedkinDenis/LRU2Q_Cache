@@ -5,12 +5,6 @@
 #include <fstream>
 #include <sstream>
 
-// #define TESTING
-
-// void run ();
-
-// int run (std::stringstream &input);
-
 int main() {
 
 #ifdef TESTING

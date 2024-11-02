@@ -1,9 +1,7 @@
-#include "../include/ideal_cache.hpp"
+#include "ideal_cache.hpp"
 #include <iostream>
 #include "containers.hpp"
 #include <sstream>
-
-// #ifndef TESTING
 
 void run () {
 
@@ -27,8 +25,6 @@ void run () {
     std::cout << hits << std::endl;
 }
 
-// #else
-
 int run (std::stringstream &input) {
 
     int sz;
@@ -50,5 +46,3 @@ int run (std::stringstream &input) {
     hits = cache.check_hits_ideal_cache(data);
     return hits;
 }
-
-// #endif
