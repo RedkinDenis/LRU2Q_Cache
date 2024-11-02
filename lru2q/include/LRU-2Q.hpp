@@ -23,11 +23,10 @@ struct Q2Lists {
             lstAm.listSize = cacheSize / 2;        
             lstA1In.listSize = (cacheSize - lstAm.listSize) / 2;
             lstA1Out.listSize = cacheSize - lstAm.listSize - lstA1In.listSize;
+
+            return;
         }
-        else {
-            
-            lstAm.listSize = cacheSize;
-        }
+        lstAm.listSize = cacheSize;
     }
 };
 
@@ -62,10 +61,7 @@ public:
 
         lists.set_lists_size(cacheSize);
         
-        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) 
-            type = cacheType::LRU2Q;
-        else
-            type = cacheType::LRU;
+        set_type(cacheSize);
 
         for (int i = 0; i < pageCount; i++) {
 
@@ -88,10 +84,7 @@ public:
 
         lists.set_lists_size(cacheSize);
 
-        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) 
-            type = cacheType::LRU2Q;
-        else
-            type = cacheType::LRU;
+        set_type(cacheSize);
 
         for (int i = 0; i < pageCount; i++) {
 
@@ -109,6 +102,24 @@ private:
     Q2HashTables<T> hashTables = {}; 
     int hits = 0;
     
+    void lookup_update (T elem) {
+
+        if (type == cacheType::LRU2Q)
+            lookup_update_2Q(elem);
+        else if (type == cacheType::LRU)
+            lookup_update_LRU(elem);
+        else 
+            std::cerr << "unknown cache type" << std::endl;
+    }
+    
+    void lookup_update_2Q(T elem) {
+
+        if (in_map_am(elem)) return;
+        if (in_map_in(elem)) return;
+        if (in_map_out(elem)) return;
+        add_new_page(elem);
+    }
+
     bool in_map_am (T elem) {
 
         bool isInMapAm = hashTables.mapAm.count(elem) > 0;
@@ -172,15 +183,6 @@ private:
     }
 
 
-    void lookup_update_2Q(T elem) {
-
-        if (in_map_am(elem)) return;
-        if (in_map_in(elem)) return;
-        if (in_map_out(elem)) return;
-        add_new_page(elem);
-    }
-
-
     void add_to_cache (cacheList<T> &list, Hashtable<T> &map, T elem) {
 
         list.lst.push_front(elem);
@@ -201,37 +203,52 @@ private:
         list.lst.pop_back();
     }
 
-    void lookup_update_LRU (int elem) {
+    void set_type (size_t cacheSize) {
+
+        if (cacheSize > LRU2Q_MIN_CACHE_SIZE) 
+            type = cacheType::LRU2Q;
+        else
+            type = cacheType::LRU;
+    }
     
+private:
+    // classic LRU cache
+    void lookup_update_LRU (T elem) {
+    
+        if (in_cache_LRU(elem)) return;
+        push_to_head_LRU(elem);
+    }
+
+    bool in_cache_LRU (T elem) {
+
         auto &map = hashTables.mapAm;
         auto &lst = lists.lstAm;
 
         if (map.count(elem) == 0)  {
-            if (lst.lst.size() == lst.listSize) {
-
-                map.erase(lst.lst.back());
-                lst.lst.pop_back();
-            }
+            return false;
         }
-        else {
-            
-            hits += 1;
+        
+        hits += 1;
 
-            lst.lst.erase(map.find(elem)->second);
-            map.erase(elem);
-        }
+        lst.lst.erase(map.find(elem)->second);
+        map.erase(elem);
 
         lst.lst.push_front(elem);
         map.insert({elem, lst.lst.begin()});
+        return true;
     }
 
-    void lookup_update (T elem) {
+    void push_to_head_LRU (T elem) {
 
-        if (type == cacheType::LRU2Q)
-            lookup_update_2Q(elem);
-        else if (type == cacheType::LRU)
-            lookup_update_LRU(elem);
-        else 
-            std::cerr << "unknown cache type" << std::endl;
+        auto &map = hashTables.mapAm;
+        auto &lst = lists.lstAm;
+
+        if (lst.lst.size() == lst.listSize) {
+
+            map.erase(lst.lst.back());
+            lst.lst.pop_back();
+        }
+        lst.lst.push_front(elem);
+        map.insert({elem, lst.lst.begin()});
     }
 };
