@@ -111,7 +111,10 @@ private:
         else 
             std::cerr << "unknown cache type" << std::endl;
     }
-    
+
+private:
+
+    // LRU2Q methods    
     void lookup_update_2Q(T elem) {
 
         if (in_map_am(elem)) return;
@@ -212,7 +215,7 @@ private:
     }
     
 private:
-    // classic LRU cache
+    // classic LRU cache methods
     void lookup_update_LRU (T elem) {
     
         if (in_cache_LRU(elem)) return;
