@@ -5,9 +5,7 @@ project(lru2q)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(INCLUDE_DIR1 ${CMAKE_SOURCE_DIR}/include)
-
-set(INCLUDE_DIR2 ${CMAKE_SOURCE_DIR}/../include)
+set(INCLUDE_DIR1 ${CMAKE_SOURCE_DIR}/lru2q/include)
 
 find_package(GTest REQUIRED)
 
@@ -26,15 +24,15 @@ target_link_libraries(lru2q.x lru2Q)
 
 
 
-add_library(test STATIC ${SRCS1})
+add_library(test2q STATIC ${SRCS1})
 
-target_include_directories(test PUBLIC ${INCLUDE_DIR1})
-target_include_directories(test PUBLIC ${INCLUDE_DIR2})
-target_include_directories(test PUBLIC ${GTEST_INCLUDE_DIRS})
+target_include_directories(test2q PUBLIC ${INCLUDE_DIR1})
+target_include_directories(test2q PUBLIC ${INCLUDE_DIR2})
+target_include_directories(test2q PUBLIC ${GTEST_INCLUDE_DIRS})
 
 add_executable(lru2q.test main2Q.cpp)
 
-target_link_libraries(lru2q.test test)
+target_link_libraries(lru2q.test test2q)
 target_link_libraries(lru2q.test ${GTEST_LIBRARIES} pthread)
 
 target_compile_definitions(lru2q.test PRIVATE TESTING)

@@ -5,9 +5,7 @@ project(idCache)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(INCLUDE_DIR1 ${CMAKE_SOURCE_DIR}/include)
-
-set(INCLUDE_DIR2 ${CMAKE_SOURCE_DIR}/../include)
+set(INCLUDE_DIR1 ${CMAKE_SOURCE_DIR}/idcache/include)
 
 find_package(GTest REQUIRED)
 
@@ -26,15 +24,15 @@ target_link_libraries(idCache.x idCache)
 
 
 
-add_library(test STATIC ${SRCS1})
+add_library(testId STATIC ${SRCS1})
 
-target_include_directories(test PUBLIC ${INCLUDE_DIR1})
-target_include_directories(test PUBLIC ${INCLUDE_DIR2})
-target_include_directories(test PUBLIC ${GTEST_INCLUDE_DIRS})
+target_include_directories(testId PUBLIC ${INCLUDE_DIR1})
+target_include_directories(testId PUBLIC ${INCLUDE_DIR2})
+target_include_directories(testId PUBLIC ${GTEST_INCLUDE_DIRS})
 
 add_executable(idCache.test mainId.cpp)
 
-target_link_libraries(idCache.test test)
+target_link_libraries(idCache.test testId)
 target_link_libraries(idCache.test ${GTEST_LIBRARIES} pthread)
 
 target_compile_definitions(idCache.test PRIVATE TESTING)
