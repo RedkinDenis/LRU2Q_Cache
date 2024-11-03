@@ -233,11 +233,9 @@ private:
         
         hits += 1;
 
-        lst.lst.erase(map.find(elem)->second);
-        map.erase(elem);
+        delete_from_cache(lst, map, elem);
 
-        lst.lst.push_front(elem);
-        map.insert({elem, lst.lst.begin()});
+        add_to_cache(lst, map, elem);
         return true;
     }
 
@@ -251,7 +249,6 @@ private:
             map.erase(lst.lst.back());
             lst.lst.pop_back();
         }
-        lst.lst.push_front(elem);
-        map.insert({elem, lst.lst.begin()});
+        add_to_cache(lst, map, elem);
     }
 };
