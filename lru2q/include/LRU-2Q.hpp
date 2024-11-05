@@ -16,7 +16,7 @@ struct Q2Lists {
     cacheList<T> lstA1In = {};
     cacheList<T> lstA1Out = {};
 
-    inline void set_lists_size (size_t cacheSize) {
+    void set_lists_size (size_t cacheSize) {
 
         if (cacheSize > LRU2Q_MIN_CACHE_SIZE) {
             
