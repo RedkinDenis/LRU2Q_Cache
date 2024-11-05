@@ -49,52 +49,31 @@ private:
 
 public:
 
-    int run () {
-
-        T page;
-
-        int cacheSize = 0;
-        std::cin >> cacheSize;
-
-        int pageCount = 0;
-        std::cin >> pageCount;
-
+    Lru2qCache (size_t cacheSize) {
         lists.set_lists_size(cacheSize);
-        
         set_type(cacheSize);
-
-        for (int i = 0; i < pageCount; i++) {
-
-            std::cin >> page;
-            lookup_update(page);
-        }
-
-        return hits;
     }
 
-    int run (std::stringstream &input) {
+    void lookup_update (T elem) {
 
-        T page;
+        switch(type) {
+            case cacheType::LRU2Q:
+                lookup_update_2Q(elem);
+                break;
 
-        int cacheSize = 0;
-        input >> cacheSize;
+            case cacheType::LRU:
+                lookup_update_LRU(elem);
+                break;
 
-        int pageCount = 0;
-        input >> pageCount;
-
-        lists.set_lists_size(cacheSize);
-
-        set_type(cacheSize);
-
-        for (int i = 0; i < pageCount; i++) {
-
-            input >> page;
-            lookup_update(page);
+            default:
+                std::cerr << "unknown cache type" << std::endl;
+                exit(-1);
         }
-
-        return hits;
     }
 
+    int get_hits () const {
+        return hits;
+    }
 private:
 
     cacheType type;
@@ -102,15 +81,6 @@ private:
     Q2HashTables<T> hashTables = {}; 
     int hits = 0;
     
-    void lookup_update (T elem) {
-
-        if (type == cacheType::LRU2Q)
-            lookup_update_2Q(elem);
-        else if (type == cacheType::LRU)
-            lookup_update_LRU(elem);
-        else 
-            std::cerr << "unknown cache type" << std::endl;
-    }
 
 private:
 
@@ -252,3 +222,5 @@ private:
         add_to_cache(lst, map, elem);
     }
 };
+
+int run (std::istream &input = std::cin);
