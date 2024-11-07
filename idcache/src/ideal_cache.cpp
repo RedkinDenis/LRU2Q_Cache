@@ -3,29 +3,8 @@
 #include "containers.hpp"
 #include <sstream>
 
-void run () {
 
-    int sz;
-    std::cin >> sz;
-
-    std::vector<TPage> data;
-    idealCache<TPage> cache(sz);
-
-    int num;
-    std::cin >> num;
-
-    int val;
-    for(int i = 0; i < num; i++) {
-        std::cin >> val;
-        data.push_back(val);
-    }
-
-    int hits;
-    hits = cache.check_hits_ideal_cache(data);
-    std::cout << hits << std::endl;
-}
-
-int run (std::stringstream &input) {
+int run (std::istream &input) {
 
     int sz;
     input >> sz;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 #include <unordered_map>
 
@@ -17,10 +18,11 @@ public:
 
         int pagesCount = pages.size();
         auto pgIt = pages.begin();
+        int hits = 0;
 
         for(int currentPageNumber = 0; currentPageNumber < pagesCount; currentPageNumber++, pgIt++) {
 
-            lookup_update(pgIt, pages.end());
+            hits += lookup_update(pgIt, pages.end());
         }
         return hits;
     }
@@ -34,18 +36,17 @@ private:
     std::vector<T> cache;
 
     size_t sz;
-    int hits = 0;
 
-    void lookup_update (ListIterator pgIt, ListIterator pEnd) {
+    int lookup_update (ListIterator pgIt, ListIterator pEnd) {
 
         if (hashtable.count(*pgIt) == 0) {
 
-            if (cache_full(pgIt, pEnd)) return;
+            if (cache_full(pgIt, pEnd)) return 0;
             add_to_cache(*pgIt, pEnd);
-            return;
+            return 0;
         }
 
-        hits++;
+        return 1;
     }
 
     bool cache_full (ListIterator pgIt, ListIterator pEnd) {
@@ -103,6 +104,4 @@ private:
     }
 };
 
-void run ();
-
-int run (std::stringstream &input);
+int run (std::istream &input = std::cin);
