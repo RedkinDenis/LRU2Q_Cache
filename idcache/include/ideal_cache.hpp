@@ -8,25 +8,6 @@ class idealCache {
 public:
     idealCache(size_t setSz) : sz(setSz) {}
 
-    int check_hits_ideal_cache(const std::vector<T>& pages) {
-        int pagesCount = pages.size();
-        int hits = 0;
-
-        for (int currentPageNumber = 0; currentPageNumber < pagesCount; currentPageNumber++) {
-            hits += lookup_update(pages, currentPageNumber);
-        }
-        return hits;
-    }
-
-private:
-    using ListIterator = typename std::vector<T>::iterator;
-    using Hashtable = std::unordered_map<T, ListIterator>;
-
-    Hashtable hashtable;
-    std::vector<T> cache;
-    size_t sz;
-    int hits = 0;
-
     int lookup_update (const std::vector<T>& pages, int currentPageNumber) {
 
         T page = pages[currentPageNumber];
@@ -42,6 +23,15 @@ private:
         
         return 0; 
     }
+    
+private:
+    using ListIterator = typename std::vector<T>::iterator;
+    using Hashtable = std::unordered_map<T, ListIterator>;
+
+    Hashtable hashtable;
+    std::vector<T> cache;
+    size_t sz;
+    int hits = 0;
 
     bool delete_extra_page (const std::vector<T>& pages, int currentPageNumber) {
 
