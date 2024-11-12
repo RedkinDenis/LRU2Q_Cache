@@ -11,7 +11,8 @@ int main() {
     testing::InitGoogleTest();
     auto r = RUN_ALL_TESTS();
 #else
-    run();
+    auto hits = run();
+    std::cout << hits << std::endl;
 #endif
 }
 
