@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <iostream>
 
+using pageLoadingF = TPage*(*)(int);
+
 template<typename T>
 class idealCache {
 public:
     idealCache(size_t setSz) : sz(setSz) {}
 
-    int lookup_update (const std::vector<T>& pages, int currentPageNumber) {
+    int lookup_update (const std::vector<T>& pages, int currentPageNumber, pageLoadingF loadF = nullptr) {
 
         T page = pages[currentPageNumber];
         if (hashtable.count(page) != 0) {
