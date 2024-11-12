@@ -8,6 +8,7 @@
 
 #define LRU2Q_MIN_CACHE_SIZE 3
 
+
 template<typename T>
 struct Q2Lists {
 
@@ -39,7 +40,7 @@ struct Q2HashTables {
 
 template<typename T>
 class Lru2qCache {
-
+using pageLoadingF = T*(*)(int);
 private:
     enum class cacheType {
         LRU,
@@ -53,7 +54,7 @@ public:
         set_type(cacheSize);
     }
 
-    void lookup_update (T elem) {
+    void lookup_update (T elem, pageLoadingF loadF = nullptr) {
 
         switch(type) {
             case cacheType::LRU2Q:

@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <iostream>
 
-using pageLoadingF = TPage*(*)(int);
 
 template<typename T>
 class idealCache {
+using pageLoadingF = T*(*)(int);
 public:
     idealCache(size_t setSz) : sz(setSz) {}
 
